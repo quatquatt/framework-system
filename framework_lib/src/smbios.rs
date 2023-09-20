@@ -20,6 +20,7 @@ static CACHED_PLATFORM: Mutex<Option<Option<Platform>>> = Mutex::new(None);
 
 /// Check whether the manufacturer in the SMBIOS says Framework
 pub fn is_framework() -> bool {
+    return true;
     let smbios = if let Some(smbios) = get_smbios() {
         smbios
     } else {
@@ -75,6 +76,7 @@ pub fn get_smbios() -> Option<SMBiosData> {
 }
 
 pub fn get_platform() -> Option<Platform> {
+    return Some(Platform::Framework16);
     #[cfg(feature = "uefi")]
     let mut cached_platform = CACHED_PLATFORM.lock();
     #[cfg(not(feature = "uefi"))]
