@@ -290,6 +290,7 @@ impl EcResponseExpansionBayStatus {
         match (self.board_id_1, self.board_id_0) {
             (BOARD_VERSION_12, BOARD_VERSION_12) => Some(ExpansionBayBoard::DualInterposer),
             (BOARD_VERSION_11, BOARD_VERSION_15) => Some(ExpansionBayBoard::SingleInterposer),
+            (BOARD_VERSION_13, BOARD_VERSION_15) => Some(ExpansionBayBoard::SingleInterposer),
             (BOARD_VERSION_15, BOARD_VERSION_15) => None,
             _ => Some(ExpansionBayBoard::Invalid),
         }
