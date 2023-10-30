@@ -8,8 +8,10 @@ use core::prelude::v1::derive;
 use log::Level;
 
 use crate::ccgx::{AppVersion, Application, BaseVersion, ControllerVersion, MainPdVersions};
-use crate::chromium_ec::command::EcRequestRaw;
-use crate::chromium_ec::commands::{EcRequestReadPdVersion, EcRequestUsbPdPowerInfo};
+use crate::chromium_ec::command::{EcRequestRaw, *};
+use crate::chromium_ec::commands::{
+    EcRequestReadPdVersion, EcRequestUsbPdControlV0, EcRequestUsbPdPowerInfo, *,
+};
 use crate::chromium_ec::{print_err_ref, CrosEc, CrosEcDriver, EcResult};
 use crate::smbios::get_platform;
 
@@ -438,6 +440,61 @@ pub fn get_and_print_pd_info(ec: &CrosEc) {
             println!("  Max Power:     Unknown");
         }
     }
+
+    println!(
+        "UsbPdControl V0 supported: {}",
+        ec.cmd_version_supported(EcCommands::UsbPdControl as u16, 0)
+            .unwrap()
+    );
+    println!(
+        "UsbPdControl V1 supported: {}",
+        ec.cmd_version_supported(EcCommands::UsbPdControl as u16, 1)
+            .unwrap()
+    );
+    println!(
+        "UsbPdControl V2 supported: {}",
+        ec.cmd_version_supported(EcCommands::UsbPdControl as u16, 2)
+            .unwrap()
+    );
+
+    println!(
+        "GetCmdVersions V0 supported: {}",
+        ec.cmd_version_supported(EcCommands::GetCmdVersions as u16, 0)
+            .unwrap()
+    );
+    println!(
+        "GetCmdVersions V1 supported: {}",
+        ec.cmd_version_supported(EcCommands::GetCmdVersions as u16, 1)
+            .unwrap()
+    );
+    println!(
+        "GetCmdVersions V2 supported: {}",
+        ec.cmd_version_supported(EcCommands::GetCmdVersions as u16, 2)
+            .unwrap()
+    );
+
+    let info = EcRequestGetCmdVersionsV0 {
+        cmd: EcCommands::UsbPdControl as u8,
+    }
+    .send_command(ec)
+    .unwrap();
+    println!("UsbPdControl Versions: {:?}", info);
+    let info = EcRequestGetCmdVersionsV1 {
+        cmd: EcCommands::UsbPdControl as u32,
+    }
+    .send_command(ec)
+    .unwrap();
+    println!("UsbPdControl Versions: {:?}", info);
+
+    let info = EcRequestUsbPdControlV0 {
+        port: 0,
+        role: 0,
+        mux: 0,
+        swap: 0,
+    }
+    .send_command(ec)
+    .unwrap();
+    println!("Info: {:#?}", info);
 }
 
 // TODO: Improve return type to be more obvious

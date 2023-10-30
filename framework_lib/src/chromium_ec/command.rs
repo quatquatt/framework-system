@@ -25,6 +25,7 @@ pub enum EcCommands {
     I2cPassthrough = 0x9e,
     ConsoleSnapshot = 0x97,
     ConsoleRead = 0x98,
+    UsbPdControl = 0x101,
     /// Get information about PD controller power
     UsbPdPowerInfo = 0x103,
 

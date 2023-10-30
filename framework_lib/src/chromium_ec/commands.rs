@@ -109,6 +109,127 @@ impl EcRequest<()> for EcRequestConsoleRead {
     }
 }
 
+pub enum UsbPdControlRole {
+	NoChange = 0,
+    /// == AUTO
+	ToggleOn = 1,
+	ToggleOff = 2,
+	ForceSink = 3,
+	ForceSource = 4,
+	Freeze = 5,
+}
+
+#[repr(u8)]
+pub enum UsbPdControlMux {
+	NoChange = 0,
+	None = 1,
+	Usb = 2,
+	Dp = 3,
+	Dock = 4,
+	Auto = 5,
+}
+
+#[repr(u8)]
+pub enum UsbPdControlSwap {
+    // No change
+	None = 0,
+	Data = 1,
+	Power = 2,
+	Vconn = 3,
+}
+
+#[repr(C, packed)]
+pub struct EcRequestUsbPdControlV0 {
+	pub port: u8,
+	pub role: u8,
+	pub mux: u8,
+    // See UsbPdControlSwap. None to read
+	pub swap: u8,
+}
+
+#[repr(C, packed)]
+#[derive(Debug)]
+pub struct EcResponseUsbPdControlV0 {
+	enabled: u8,
+	role: u8,
+	polarity: u8,
+	state: u8,
+}
+impl EcRequest<EcResponseUsbPdControlV0> for EcRequestUsbPdControlV0 {
+    fn command_id() -> EcCommands {
+        EcCommands::UsbPdControl
+    }
+    fn command_version() -> u8 {
+        0
+    }
+}
+
+#[repr(C, packed)]
+pub struct EcRequestUsbPdControlV1 {
+	pub port: u8,
+	pub role: u8,
+	pub mux: u8,
+    // See UsbPdControlSwap. None to read
+	pub swap: u8,
+}
+
+#[repr(C, packed)]
+#[derive(Debug)]
+pub struct EcResponseUsbPdControlV1 {
+	enabled: u8,
+	role: u8,
+	polarity: u8,
+	state: [u8; 32],
+}
+
+impl EcRequest<EcResponseUsbPdControlV1> for EcRequestUsbPdControlV1 {
+    fn command_id() -> EcCommands {
+        EcCommands::UsbPdControl
+    }
+    fn command_version() -> u8 {
+        1
+    }
+}
+
+#[repr(C, packed)]
+pub struct EcRequestUsbPdControlV2 {
+	pub port: u8,
+	pub role: u8,
+	pub mux: u8,
+    // See UsbPdControlSwap. None to read
+	pub swap: u8,
+}
+
+#[repr(C, packed)]
+#[derive(Debug)]
+pub struct EcResponseUsbPdControlV2 {
+    enabled: u8,
+    role: u8,
+    polarity: u8,
+    state: [u8; 32],
+    /// enum pd_cc_states representing cc state
+    cc_state: u8,
+    /// Current DP pin mode (MODE_DP_PIN_[A-E])
+    dp_mode: u8,
+    reserved: u8,
+    /// USB_PD_CTRL_*flags
+    control_flags: u8,
+    /// TODO: b:158234949 Add definitions for cable speed
+    /// USB_R30_SS/TBT_SS_* cable speed
+    cable_speed: u8,
+    /// TBT_GEN3_* cable rounded support
+    cable_gen: u8,
+}
+
+impl EcRequest<EcResponseUsbPdControlV2> for EcRequestUsbPdControlV2 {
+    fn command_id() -> EcCommands {
+        EcCommands::UsbPdControl
+    }
+    fn command_version() -> u8 {
+        2
+    }
+}
+
 #[repr(C, packed)]
 pub struct EcRequestUsbPdPowerInfo {
     pub port: u8,
