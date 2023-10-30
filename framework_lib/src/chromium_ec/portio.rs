@@ -190,6 +190,18 @@ lazy_static! {
     static ref INITIALIZED: Arc<Mutex<Initialized>> = Arc::new(Mutex::new(Initialized::NotYet));
 }
 
+fn _supported() -> bool {
+    #[cfg(feature = "linux_pio")]
+    unsafe {
+        if ioperm(EC_LPC_ADDR_HOST_ARGS as u64, 8 + 0xFF, 1) != 0 {
+            error!("ioperm failed. portio driver is likely block by Linux kernel lockdown mode");
+            return false;
+        }
+    }
+
+    true
+}
+
 #[cfg(not(feature = "linux_pio"))]
 fn init() -> bool {
     // Nothing to do for bare-metal (UEFI) port I/O
