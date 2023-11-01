@@ -342,7 +342,7 @@ impl CrosEc {
     /// Check the current brightness of the keyboard backlight
     ///
     pub fn get_keyboard_backlight(&self) -> EcResult<u8> {
-        let kblight = EcRequestPwmGetKeyboardBacklight {}.send_command(self)?;
+        let kblight: EcResponsePwmGetKeyboardBacklight = EcRequestPwmGetKeyboardBacklight {}.send_command(self)?;
 
         // The enabled field is deprecated and must always be 1
         debug_assert_eq!(kblight.enabled, 1);
@@ -351,6 +351,32 @@ impl CrosEc {
         }
 
         Ok(kblight.percent)
+    }
+
+    /// Get the GPU Serial
+    ///
+    pub fn get_gpu_serial(&self) -> EcResult<String> {
+        let gpuserial: EcResponseGetGpuSerial = EcRequestGetGpuSerial {idx: 0}.send_command(self)?;
+        let serial: String = String::from_utf8(gpuserial.serial.to_vec()).unwrap();
+
+        if gpuserial.valid == 0 {
+            println!("no valid gpu serial");
+            return Ok(serial);
+        }
+        return Ok(serial);
+    }
+
+    /// Set the GPU Serial
+    ///
+    /// # Arguments
+    /// `newserial` - a string that is 18 characters long
+    pub fn set_gpu_serial(&self, newserial: String) {
+        let response = EcRequestSetGpuSerial {
+            magic: SetGpuSerialMagic::WriteGPUConfig as u8,
+            idx: 0,
+            serial: newserial.as_bytes().try_into().unwrap(),
+        }
+        .send_command(self);
     }
 
     /// Requests recent console output from EC and constantly asks for more
