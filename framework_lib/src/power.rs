@@ -70,6 +70,11 @@ const EC_BATT_FLAG_DISCHARGING: u8 = 0x04;
 const EC_BATT_FLAG_CHARGING: u8 = 0x08;
 const EC_BATT_FLAG_LEVEL_CRITICAL: u8 = 0x10;
 
+const EC_FAN_SPEED_STALLED: u16 = 0x0000;
+/// Used on old EC firmware (before 2023)
+const EC_FAN_SPEED_STALLED_DEPRECATED: u16 = 0xFFFE;
+const EC_FAN_SPEED_NOT_PRESENT: u16 = 0xFFFF;
+
 #[derive(Debug)]
 enum TempSensor {
     Ok(u8),
@@ -230,7 +235,13 @@ pub fn print_thermal(ec: &CrosEc) {
     }
 
     let fan0 = u16::from_le_bytes([fans[0], fans[1]]);
-    println!("  Fan Speed:    {:>4} RPM", fan0);
+    if fan0 == EC_FAN_SPEED_STALLED || fan0 == EC_FAN_SPEED_STALLED_DEPRECATED {
+        println!("  Fan Speed:        0 RPM (Stalled)");
+    } else if fan0 == EC_FAN_SPEED_NOT_PRESENT {
+        println!("  Fan Speed:    Not present");
+    } else {
+        println!("  Fan Speed:    {:>4} RPM", fan0);
+    }
 }
 
 // TODO: Use Result
