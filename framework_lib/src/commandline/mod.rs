@@ -48,6 +48,9 @@ use crate::smbios::{dmidecode_string_val, get_smbios, is_framework};
 use crate::uefi::enable_page_break;
 use crate::util;
 use crate::util::Config;
+#[cfg(target_os = "windows")]
+use crate::wmi;
+
 #[cfg(feature = "hidapi")]
 use hidapi::HidApi;
 use sha2::{Digest, Sha256, Sha384, Sha512};
@@ -149,6 +152,7 @@ pub struct Cli {
     pub console: Option<ConsoleArg>,
     pub reboot_ec: Option<RebootEcArg>,
     pub hash: Option<String>,
+    pub drivers: bool,
     pub pd_addrs: Option<(u16, u16)>,
     pub pd_ports: Option<(u8, u8)>,
     pub has_mec: Option<bool>,
@@ -756,6 +760,11 @@ pub fn run_with_args(args: &Cli, _allupdate: bool) -> i32 {
         flash_ec(&ec, ec_bin_path, EcFlashType::Ro);
     } else if let Some(ec_bin_path) = &args.flash_rw_ec {
         flash_ec(&ec, ec_bin_path, EcFlashType::Rw);
+    } else if args.drivers {
+        #[cfg(target_os = "windows")]
+        wmi::print_drivers();
+        #[cfg(not(target_os = "windows"))]
+        println!("Driver Version only supported on Windows");
     } else if let Some(hash_file) = &args.hash {
         println!("Hashing file: {}", hash_file);
         #[cfg(feature = "uefi")]
