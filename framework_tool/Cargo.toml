@@ -2,12 +2,16 @@
 name = "framework_tool"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [features]
 default = ["linux"]
 linux = ["framework_lib/linux"]
 freebsd = ["framework_lib/freebsd"]
 windows = ["framework_lib/windows"]
+
+[build-dependencies]
+static_vcruntime = "2.0"
 
 [dependencies.framework_lib]
 path = "../framework_lib"
