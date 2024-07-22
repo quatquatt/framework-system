@@ -25,6 +25,13 @@ default-members = [
 #[patch.crates-io]
 #uefi = { git = "https://github.com/FrameworkComputer/uefi-rs", branch = "merged" }
 #uefi-services = { git = "https://github.com/FrameworkComputer/uefi-rs", branch = "merged" }
+[source.crates-io]
+replace-with = 'cargo'
+[patch.'https://github.com/FrameworkComputer/rust-hwio']
+redox_hwio = { path = '/home/zoid/freebsd-ports/sysutils/framework-system/work/rust-hwio-9e6e7529ffd6caf7aa6a17be1eca6756b302f736' }
+[patch.'https://github.com/FrameworkComputer/smbios-lib.git']
+smbios-lib = { path = '/home/zoid/freebsd-ports/sysutils/framework-system/work/smbios-lib-b3e2fff8a6f4b8c2d729467cbbf0c8c41974cd1c' }
+
 
 [profile.release]
 lto = true
