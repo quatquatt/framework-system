@@ -306,8 +306,8 @@ Keyboard backlight: 0%
 sudo pkg install hidapi
 
 # Build the library and tool
-cargo build --no-default-features --features freebsd
+cargo build --no-default-features --features freebsd rusb
 
 # Running the tool
-cargo run --no-default-features --features freebsd
+cargo run --no-default-features --features freebsd rusb
 ```
