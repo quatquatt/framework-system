@@ -64,13 +64,16 @@ impl Config {
     }
 
     pub fn get() -> MutexGuard<'static, Option<Self>> {
+        // This will lock and unlock CONFIG, so it must be before we lock it here
+        let platform = smbios::get_platform();
+
         #[cfg(feature = "std")]
         let mut config = CONFIG.lock().unwrap();
         #[cfg(not(feature = "std"))]
         let mut config = CONFIG.lock();
 
         if (*config).is_none() {
-            if let Some(platform) = smbios::get_platform() {
+            if let Some(platform) = platform {
                 // TODO: Perhaps add Qemu or NonFramework as a platform
                 *config = Some(Config {
                     verbose: false,
